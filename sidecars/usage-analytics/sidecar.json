@@ -1,0 +1,20 @@
+{
+  "command": "node",
+  "args": [
+    "index.js"
+  ],
+  "restart_policy": "always",
+  "display_name": "GravityLog",
+  "description": "GravityLog - Antigravity Usage Tracker",
+  "has_web_ui": true,
+  "ui_config": {
+    "display_name": "GravityLog",
+    "views": [
+      {
+        "entrypoint": "SIDECAR_UI_ENTRYPOINT_AUX_PANE",
+        "path": "/",
+        "title": "GravityLog - Antigravity Usage Tracker"
+      }
+    ]
+  }
+}

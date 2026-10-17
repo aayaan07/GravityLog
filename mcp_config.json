@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "usage-analytics": {
+      "command": "node",
+      "args": [
+        "mcp/mcp_server.js"
+      ]
+    }
+  }
+}

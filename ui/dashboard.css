@@ -1,0 +1,819 @@
+/**
+ * GravityLog - Antigravity 2.0 Native Usage Analytics Dashboard
+ * Google Material 3 Surface Architecture (Light & Dark)
+ */
+
+:root,
+[data-theme="light"] {
+  --gl-bg-canvas: #f8fafd;
+  --gl-bg-header: rgba(248, 250, 253, 0.88);
+  --gl-card-bg: #ffffff;
+  --gl-surface-subtle: #f1f5f9;
+  --gl-surface-hover: #edf2fa;
+  --gl-border: #e2e8f0;
+  --gl-border-subtle: #eef2f6;
+
+  --gl-text-title: #1f1f1f;
+  --gl-text-body: #444746;
+  --gl-text-muted: #5f6368;
+  --gl-text-subtle: #80868b;
+
+  /* Google Blue */
+  --gl-primary: #0b57d0;
+  --gl-primary-subtle: #e8f0fe;
+  --gl-primary-border: #d2e3fc;
+
+  /* Google Green */
+  --gl-success: #146c2e;
+  --gl-success-subtle: #e6f4ea;
+  --gl-success-border: #ceead6;
+
+  /* Google Amber */
+  --gl-amber: #b06000;
+  --gl-amber-subtle: #fef7e0;
+  --gl-amber-border: #feefc3;
+
+  --gl-tooltip-bg: #202124;
+  --gl-tooltip-text: #ffffff;
+
+  /* Heatmap (Google Blue) */
+  --heat-0: #eef2f6;
+  --heat-1: #d3e3fd;
+  --heat-2: #8ab4f8;
+  --heat-3: #1b6ef3;
+  --heat-4: #0b57d0;
+
+  --gl-card-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+[data-theme="light"][data-palette="github"] {
+  --heat-0: #eef2f6;
+  --heat-1: #c4eed0;
+  --heat-2: #6dd58c;
+  --heat-3: #1ea446;
+  --heat-4: #146c2e;
+}
+
+[data-theme="dark"] {
+  --gl-bg-canvas: #131314;
+  --gl-bg-header: rgba(19, 19, 20, 0.88);
+  --gl-card-bg: #1e1f20;
+  --gl-surface-subtle: #282a2c;
+  --gl-surface-hover: #333538;
+  --gl-border: #2d2f31;
+  --gl-border-subtle: #252729;
+
+  --gl-text-title: #e3e3e3;
+  --gl-text-body: #c4c7c5;
+  --gl-text-muted: #8e918f;
+  --gl-text-subtle: #6e7270;
+
+  /* Google Blue Dark */
+  --gl-primary: #a8c7fa;
+  --gl-primary-subtle: rgba(168, 199, 250, 0.14);
+  --gl-primary-border: rgba(168, 199, 250, 0.25);
+
+  /* Google Green Dark */
+  --gl-success: #6dd58c;
+  --gl-success-subtle: rgba(109, 213, 140, 0.14);
+  --gl-success-border: rgba(109, 213, 140, 0.25);
+
+  /* Google Amber Dark */
+  --gl-amber: #ffb951;
+  --gl-amber-subtle: rgba(255, 185, 81, 0.14);
+  --gl-amber-border: rgba(255, 185, 81, 0.25);
+
+  --gl-tooltip-bg: #e3e3e3;
+  --gl-tooltip-text: #131314;
+
+  /* Heatmap (Google Blue Dark) */
+  --heat-0: #282a2c;
+  --heat-1: rgba(168, 199, 250, 0.25);
+  --heat-2: rgba(168, 199, 250, 0.5);
+  --heat-3: rgba(168, 199, 250, 0.78);
+  --heat-4: #a8c7fa;
+
+  --gl-card-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"][data-palette="github"] {
+  --heat-0: #282a2c;
+  --heat-1: #0e4429;
+  --heat-2: #006d32;
+  --heat-3: #26a641;
+  --heat-4: #39d353;
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: "Google Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--gl-text-body);
+  background-color: var(--gl-bg-canvas);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Full-Viewport Overlay Backdrop (For Electron Injector) */
+.aga-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99999999;
+  background-color: var(--gl-bg-canvas);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: agaFadeIn 150ms cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes agaFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Main Page Canvas (Directly on background, no outer box) */
+.aga-modal-card {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--gl-bg-canvas);
+  color: var(--gl-text-body);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+/* Header Bar */
+.aga-header-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: var(--gl-bg-header);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--gl-border);
+}
+
+.aga-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 32px;
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.aga-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aga-header-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.aga-brand-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.aga-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gl-text-title);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.aga-subtitle {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gl-text-muted);
+  line-height: 1.2;
+}
+
+/* Header Action Controls */
+.aga-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.aga-timeframe-group {
+  display: inline-flex;
+  background: var(--gl-card-bg);
+  padding: 3px;
+  border-radius: 9999px;
+  border: 1px solid var(--gl-border);
+}
+
+.aga-filter-btn {
+  background: transparent;
+  border: none;
+  color: var(--gl-text-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 13px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 140ms ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.aga-filter-btn:hover {
+  color: var(--gl-text-title);
+}
+
+.aga-filter-btn.active {
+  background-color: var(--gl-primary-subtle);
+  color: var(--gl-primary);
+  font-weight: 600;
+}
+
+.aga-btn-icon,
+.aga-close-btn {
+  background: var(--gl-card-bg);
+  border: 1px solid var(--gl-border);
+  color: var(--gl-text-muted);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 140ms ease;
+  flex-shrink: 0;
+}
+
+.aga-btn-icon:hover,
+.aga-close-btn:hover {
+  color: var(--gl-text-title);
+  background: var(--gl-surface-hover);
+  border-color: var(--gl-text-subtle);
+}
+
+/* Main Content Area */
+.aga-content {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 32px 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 4 Quick-View KPI Cards Grid */
+.aga-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.aga-kpi-card {
+  background-color: var(--gl-card-bg);
+  border: 1px solid var(--gl-border);
+  border-radius: 16px;
+  padding: 20px 22px;
+  box-shadow: var(--gl-card-shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 142px;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.aga-kpi-card:hover {
+  border-color: var(--gl-primary-border);
+}
+
+.aga-kpi-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.aga-kpi-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gl-text-muted);
+  white-space: nowrap;
+}
+
+.aga-kpi-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: var(--gl-primary-subtle);
+  color: var(--gl-primary);
+  white-space: nowrap;
+}
+
+.aga-kpi-badge.success {
+  background: var(--gl-success-subtle);
+  color: var(--gl-success);
+}
+
+.aga-kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gl-text-title);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  margin-bottom: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.aga-kpi-value.model-name {
+  font-size: 21px;
+  line-height: 1.35;
+}
+
+.aga-kpi-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--gl-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 28px;
+}
+
+.aga-kpi-subtext {
+  font-size: 12px;
+  color: var(--gl-text-muted);
+  font-weight: 500;
+}
+
+/* Input/Output Token Breakdown Inside Card Footer */
+.aga-token-breakdown-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.aga-token-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+
+.aga-token-row .lbl {
+  color: var(--gl-text-muted);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.aga-token-row .lbl::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.aga-token-row.input .lbl::before { background-color: var(--gl-primary); }
+.aga-token-row.output .lbl::before { background-color: #8430ce; }
+
+.aga-token-row .val {
+  color: var(--gl-text-title);
+  font-weight: 600;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11.5px;
+}
+
+/* Section Cards (Heatmap & Model Distribution) */
+.aga-section {
+  background-color: var(--gl-card-bg);
+  border: 1px solid var(--gl-border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: var(--gl-card-shadow);
+}
+
+.aga-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.aga-section-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gl-text-title);
+  letter-spacing: -0.01em;
+}
+
+.aga-palette-toggle-label {
+  font-size: 12.5px;
+  color: var(--gl-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+  transition: color 120ms ease;
+}
+
+.aga-palette-toggle-label:hover {
+  color: var(--gl-text-title);
+}
+
+.aga-palette-toggle-label input {
+  accent-color: var(--gl-primary);
+}
+
+/* Heatmap Grid (Auto-scrolled to right via JS) */
+.aga-heatmap-container {
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gl-border) transparent;
+}
+
+.aga-heatmap-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.aga-heatmap-container::-webkit-scrollbar-thumb {
+  background-color: var(--gl-border);
+  border-radius: 9999px;
+}
+
+.aga-heatmap-wrapper {
+  display: flex;
+  gap: 12px;
+  min-width: max-content;
+}
+
+.aga-day-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 22px;
+  padding-bottom: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gl-text-subtle);
+  user-select: none;
+}
+
+.aga-calendar-cols {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.aga-month-labels {
+  display: grid;
+  grid-template-columns: repeat(53, 13px);
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gl-text-subtle);
+  height: 16px;
+  user-select: none;
+}
+
+.aga-grid-weeks {
+  display: grid;
+  grid-template-columns: repeat(53, 13px);
+  grid-template-rows: repeat(7, 13px);
+  grid-auto-flow: column;
+  gap: 4px;
+}
+
+.aga-day-cell {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  background-color: var(--heat-0);
+  cursor: pointer;
+  transition: transform 100ms ease;
+}
+
+.aga-day-cell[data-level="1"] { background-color: var(--heat-1); }
+.aga-day-cell[data-level="2"] { background-color: var(--heat-2); }
+.aga-day-cell[data-level="3"] { background-color: var(--heat-3); }
+.aga-day-cell[data-level="4"] { background-color: var(--heat-4); }
+
+.aga-day-cell:hover {
+  transform: scale(1.25);
+  outline: 1.5px solid var(--gl-text-title);
+  z-index: 10;
+  position: relative;
+}
+
+.aga-heatmap-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--gl-text-muted);
+}
+
+.aga-legend-cells {
+  display: flex;
+  gap: 4px;
+}
+
+/* Model Distribution Section */
+.aga-stacked-bar {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--gl-surface-subtle);
+  display: flex;
+  gap: 2px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+
+.aga-stacked-seg {
+  height: 100%;
+  transition: width 300ms ease;
+}
+
+.aga-model-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aga-model-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: var(--gl-bg-canvas);
+  border: 1px solid var(--gl-border-subtle);
+  border-radius: 10px;
+  font-size: 13.5px;
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+
+.aga-model-item:hover {
+  border-color: var(--gl-primary-border);
+  background-color: var(--gl-surface-hover);
+}
+
+.aga-model-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--gl-text-title);
+  min-width: 0;
+}
+
+.aga-model-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.aga-model-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--gl-text-muted);
+  font-size: 12.5px;
+  flex-shrink: 0;
+}
+
+.aga-model-right .val-bold {
+  color: var(--gl-text-title);
+  font-weight: 600;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12.5px;
+}
+
+.aga-model-badge {
+  min-width: 48px;
+  text-align: center;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--gl-primary-subtle);
+  color: var(--gl-primary);
+}
+
+/* Footer */
+.aga-footer {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 32px 28px;
+  border-top: 1px solid var(--gl-border);
+  font-size: 12.5px;
+  color: var(--gl-text-muted);
+  flex-wrap: wrap;
+}
+
+.aga-footer input[type="checkbox"] {
+  accent-color: var(--gl-primary);
+}
+
+.aga-btn-secondary {
+  background: var(--gl-card-bg);
+  border: 1px solid var(--gl-border);
+  color: var(--gl-text-title);
+  padding: 6px 16px;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 120ms ease;
+}
+
+.aga-btn-secondary:hover {
+  background: var(--gl-surface-hover);
+  border-color: var(--gl-text-subtle);
+}
+
+/* Floating Tooltip */
+.aga-floating-tooltip {
+  position: fixed;
+  background: var(--gl-tooltip-bg);
+  color: var(--gl-tooltip-text);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 100000000;
+  opacity: 0;
+  transform: translate(-50%, -100%) translateY(-8px);
+  transition: opacity 75ms ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Fixed Native Chrome Trigger Buttons */
+.aga-chrome-pill-btn {
+  position: fixed;
+  left: 68px;
+  bottom: 20px;
+  z-index: 9999999;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  background: #1f1f1f;
+  border: 1px solid #333537;
+  color: #e3e3e3;
+  font-family: "Google Sans", "Inter", -apple-system, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+  user-select: none;
+  transition: all 140ms ease;
+}
+
+.aga-chrome-pill-btn:hover {
+  background: #28292a;
+  border-color: #a8c7fa;
+}
+
+.aga-top-trigger {
+  position: fixed;
+  top: 6px;
+  right: 160px;
+  z-index: 9999999;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: #1f1f1f;
+  border: 1px solid #333537;
+  color: #e3e3e3;
+  font-family: "Google Sans", "Inter", -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+  user-select: none;
+  transition: all 120ms ease;
+}
+
+.aga-top-trigger:hover {
+  background: #28292a;
+  color: #ffffff;
+  border-color: #a8c7fa;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 960px) {
+  .aga-header,
+  .aga-content,
+  .aga-footer {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .aga-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .aga-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .aga-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .aga-timeframe-group {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .aga-filter-btn {
+    flex: 1;
+    padding: 5px 8px;
+    text-align: center;
+  }
+
+  .aga-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aga-section {
+    padding: 18px 16px;
+  }
+
+  .aga-model-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .aga-model-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .aga-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

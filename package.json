@@ -1,0 +1,25 @@
+{
+  "name": "gravitylog",
+  "version": "1.0.0",
+  "description": "GravityLog - Antigravity Usage Tracker for Antigravity 2.0 (Windows)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "mcp": "node mcp/mcp_server.js",
+    "test": "node test.js",
+    "install-plugin": "powershell -ExecutionPolicy Bypass -File ./install.ps1",
+    "uninstall-plugin": "powershell -ExecutionPolicy Bypass -File ./uninstall.ps1"
+  },
+  "keywords": [
+    "gravitylog",
+    "antigravity",
+    "plugin",
+    "telemetry",
+    "analytics",
+    "heatmap",
+    "mcp",
+    "tokens"
+  ],
+  "author": "Antigravity Engineering",
+  "license": "MIT"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "antigravity-analytics",
+  "displayName": "GravityLog - Antigravity Usage Tracker",
+  "description": "Clean and minimal usage analytics, token consumption tracker, and 365-day activity heatmap for Antigravity 2.0.",
+  "version": "1.0.0",
+  "suggestedPrompts": [
+    "Show my GravityLog usage analytics and token metrics",
+    "View my 365-day activity heatmap and daily streaks",
+    "Export my token consumption breakdown by AI model"
+  ]
+}

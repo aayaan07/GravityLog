@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "lastScan": 1792247592947,
+  "conversations": {
+    "5a689570-481f-454d-93ec-73995eaa6abe": {
+      "mtime": 1792247590155.2036,
+      "size": 1704115,
+      "requests": 578,
+      "userPrompts": 7,
+      "inputTokens": 3686167,
+      "outputTokens": 439886,
+      "cacheTokens": 68025410,
+      "thinkingTokens": 36702,
+      "model": "Gemini 3.8 Flash",
+      "daily": {
+        "2026-10-16": {
+          "requests": 275,
+          "userPrompts": 2,
+          "inputTokens": 1816375,
+          "outputTokens": 197152,
+          "cacheTokens": 29935132,
+          "thinkingTokens": 17698,
+          "tokens": 2013527
+        },
+        "2026-10-17": {
+          "requests": 303,
+          "userPrompts": 5,
+          "inputTokens": 1869792,
+          "outputTokens": 242734,
+          "cacheTokens": 38090278,
+          "thinkingTokens": 19004,
+          "tokens": 2112526
+        }
+      }
+    }
+  }
+}
