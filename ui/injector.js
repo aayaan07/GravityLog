@@ -404,14 +404,34 @@
             const canvas = await window.html2canvas(card, {
               scale: 2,
               useCORS: true,
-              allowTaint: true,
+              allowTaint: false,
               backgroundColor: currentTheme === 'light' ? '#f8fafd' : '#131314',
               logging: false
             });
             const dateStr = new Date().toISOString().slice(0, 10);
+            const timeStr = new Date().toTimeString().slice(0, 8).replace(/:/g, '-');
+            const filename = `gravitylog-usage-${dateStr}_${timeStr}.png`;
+            const dataUrl = canvas.toDataURL('image/png');
+
+            try {
+              await fetch('http://127.0.0.1:49221/api/save-screenshot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dataUrl, filename })
+              });
+            } catch (e) {}
+
+            try {
+              canvas.toBlob(async (blob) => {
+                if (blob && navigator.clipboard && window.ClipboardItem) {
+                  await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                }
+              });
+            } catch (e) {}
+
             const link = document.createElement('a');
-            link.download = `gravitylog-usage-${dateStr}.png`;
-            link.href = canvas.toDataURL('image/png');
+            link.download = filename;
+            link.href = dataUrl;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

@@ -96,6 +96,23 @@
             </div>
           </div>
 
+          <!-- Toast Notification Banner -->
+          <div class="aga-toast" id="aga-toast">
+            <div class="aga-toast-content">
+              <div class="aga-toast-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </div>
+              <div class="aga-toast-text">
+                <div class="aga-toast-title" id="aga-toast-title">Screenshot Saved!</div>
+                <div class="aga-toast-sub" id="aga-toast-sub">Saved to Downloads: <strong>gravitylog-usage.png</strong></div>
+              </div>
+            </div>
+            <div class="aga-toast-actions">
+              <button class="aga-toast-btn" id="aga-toast-open">Open Folder</button>
+              <button class="aga-toast-close" id="aga-toast-close">&times;</button>
+            </div>
+          </div>
+
           <!-- Content Body -->
           <div class="aga-content">
             <!-- 4 Quick-View KPI Cards -->
@@ -231,6 +248,26 @@
       }, 30000);
     }
 
+    showToast(title, htmlSub, showOpenBtn = true) {
+      const toast = this.root.querySelector('#aga-toast');
+      if (!toast) return;
+
+      const titleEl = toast.querySelector('#aga-toast-title');
+      const subEl = toast.querySelector('#aga-toast-sub');
+      const openBtn = toast.querySelector('#aga-toast-open');
+
+      if (titleEl) titleEl.textContent = title;
+      if (subEl) subEl.innerHTML = htmlSub;
+      if (openBtn) openBtn.style.display = showOpenBtn ? 'inline-flex' : 'none';
+
+      toast.classList.add('show');
+
+      if (this.toastTimer) clearTimeout(this.toastTimer);
+      this.toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 7000);
+    }
+
     async downloadScreenshot() {
       const card = this.root.querySelector('#aga-modal-card');
       if (!card) return;
@@ -241,29 +278,93 @@
       }
 
       try {
-        if (typeof window.html2canvas === 'undefined') {
-          alert('Screenshot module is loading, please try again.');
-          return;
+        // Resolve html2canvas from window or module or inject
+        let h2c = window.html2canvas;
+        if (!h2c && typeof module !== 'undefined' && module.exports) {
+          h2c = module.exports;
+          window.html2canvas = h2c;
         }
 
-        const canvas = await window.html2canvas(card, {
+        if (!h2c) {
+          await new Promise((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = `${this.apiBase}/html2canvas.min.js`;
+            s.onload = () => {
+              h2c = window.html2canvas || (typeof module !== 'undefined' && module.exports);
+              resolve();
+            };
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+        }
+
+        if (!h2c) {
+          throw new Error('Screenshot engine failed to load');
+        }
+
+        // Render card to canvas
+        const canvas = await h2c(card, {
           scale: 2,
           useCORS: true,
-          allowTaint: true,
+          allowTaint: false,
           backgroundColor: this.theme === 'light' ? '#f8fafd' : '#131314',
-          logging: false
+          logging: false,
+          ignoreElements: (el) => el.id === 'aga-toast'
         });
 
         const dateStr = new Date().toISOString().slice(0, 10);
-        const link = document.createElement('a');
-        link.download = `gravitylog-usage-${dateStr}.png`;
-        link.href = canvas.toDataURL('image/png');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const timeStr = new Date().toTimeString().slice(0, 8).replace(/:/g, '-');
+        const filename = `gravitylog-usage-${dateStr}_${timeStr}.png`;
+        const dataUrl = canvas.toDataURL('image/png');
+
+        let savedPath = '';
+        try {
+          const saveRes = await fetch(`${this.apiBase}/api/save-screenshot`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ dataUrl, filename })
+          });
+          if (saveRes.ok) {
+            const result = await saveRes.json();
+            savedPath = result.filePath || '';
+          }
+        } catch (netErr) {
+          console.warn('[GravityLog] Direct server save error:', netErr.message);
+        }
+
+        // Also trigger browser standard download as dual fallback
+        try {
+          const link = document.createElement('a');
+          link.download = filename;
+          link.href = dataUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (e) {}
+
+        // Also copy image to clipboard
+        try {
+          canvas.toBlob(async (blob) => {
+            if (blob && navigator.clipboard && window.ClipboardItem) {
+              await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+            }
+          });
+        } catch (e) {}
+
+        // Display on-screen confirmation banner
+        const displayPath = savedPath || `Downloads\\${filename}`;
+        this.showToast(
+          'Screenshot Saved Successfully!',
+          `Saved to: <strong>${displayPath}</strong> &bull; Copied to Clipboard`,
+          true
+        );
       } catch (err) {
         console.error('[GravityLog] Screenshot export error:', err);
-        alert('Failed to generate screenshot: ' + (err.message || err));
+        this.showToast(
+          'Screenshot Failed',
+          `Error: ${err.message || err}`,
+          false
+        );
       } finally {
         if (btn) {
           btn.disabled = false;
@@ -322,6 +423,17 @@
       if (screenshotBtn) {
         screenshotBtn.addEventListener('click', () => this.downloadScreenshot());
       }
+
+      // Toast buttons
+      this.root.querySelector('#aga-toast-open')?.addEventListener('click', async () => {
+        try {
+          await fetch(`${this.apiBase}/api/open-screenshot-folder`);
+        } catch (e) {}
+      });
+
+      this.root.querySelector('#aga-toast-close')?.addEventListener('click', () => {
+        this.root.querySelector('#aga-toast')?.classList.remove('show');
+      });
 
       // Export buttons
       this.root.querySelector('#aga-btn-export-json')?.addEventListener('click', () => {

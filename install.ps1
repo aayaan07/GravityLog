@@ -42,7 +42,7 @@ if (Test-Path $nestedSidecars) {
 
 # Stop any previous background server instance so files and ports are cleanly released
 try {
-    Get-CimInstance Win32_Process -Filter "name = 'node.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*server.js*" } | ForEach-Object {
+    Get-CimInstance Win32_Process -Filter "name = 'node.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*server.js*" -or $_.CommandLine -like "*usage-analytics*" } | ForEach-Object {
         Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
     }
     Start-Sleep -Milliseconds 400
@@ -132,11 +132,14 @@ Write-Host "   -> Clean mode configured: using native right sidebar window (no e
 # 5. Start Background Service
 Write-Host "[5/5] Starting local analytics service..." -ForegroundColor Yellow
 try {
-    Start-Process -FilePath "node" -ArgumentList "$pluginDir\server.js" -WorkingDirectory $pluginDir -WindowStyle Hidden -ErrorAction SilentlyContinue
-    Start-Sleep -Milliseconds 800
+    $cmd = "node `"$pluginDir\server.js`""
+    $wmi = [wmiclass]"win32_process"
+    $res = $wmi.Create($cmd, $pluginDir, $null)
+    Start-Sleep -Milliseconds 1000
     Write-Host "   -> Background service active on http://127.0.0.1:49221" -ForegroundColor Green
 } catch {
-    Write-Host "   -> Background service note: $($_.Exception.Message)" -ForegroundColor DarkGray
+    Start-Process -FilePath "node" -ArgumentList "$pluginDir\server.js" -WorkingDirectory $pluginDir -WindowStyle Hidden -ErrorAction SilentlyContinue
+    Write-Host "   -> Background service started via fallback." -ForegroundColor DarkGray
 }
 
 Write-Host ""

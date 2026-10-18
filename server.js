@@ -114,6 +114,72 @@ const server = http.createServer((req, res) => {
     return handleExport(res, format, false);
   }
 
+  // Save screenshot directly to disk (Windows Downloads folder)
+  if (pathname === '/api/save-screenshot' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk;
+      if (body.length > 25 * 1024 * 1024) {
+        req.connection.destroy();
+      }
+    });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body);
+        const dataUrl = payload.dataUrl || payload.image || '';
+        const base64Data = dataUrl.replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        const userProfile = process.env.USERPROFILE || 'C:\\Users\\aayaa';
+        const downloadsDir = path.join(userProfile, 'Downloads');
+        if (!fs.existsSync(downloadsDir)) {
+          fs.mkdirSync(downloadsDir, { recursive: true });
+        }
+
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const safeFilename = (payload.filename || `gravitylog-usage-${dateStr}.png`).replace(/[\\/:\*\?"<>\|]/g, '-');
+        const targetPath = path.join(downloadsDir, safeFilename);
+
+        fs.writeFileSync(targetPath, buffer);
+
+        // Also save a copy inside screenshots folder
+        try {
+          const screenshotsDir = path.join(__dirname, 'screenshots');
+          if (!fs.existsSync(screenshotsDir)) {
+            fs.mkdirSync(screenshotsDir, { recursive: true });
+          }
+          fs.writeFileSync(path.join(screenshotsDir, safeFilename), buffer);
+        } catch (e) {}
+
+        console.log(`[Server] Screenshot saved to: ${targetPath}`);
+
+        return sendJson(res, 200, {
+          success: true,
+          filePath: targetPath,
+          filename: safeFilename,
+          folder: downloadsDir
+        });
+      } catch (err) {
+        console.error('[Server] Save screenshot error:', err.message);
+        return sendJson(res, 500, { success: false, error: err.message });
+      }
+    });
+    return;
+  }
+
+  // Open the screenshots folder in Windows Explorer
+  if (pathname === '/api/open-screenshot-folder') {
+    const userProfile = process.env.USERPROFILE || 'C:\\Users\\aayaa';
+    const downloadsDir = path.join(userProfile, 'Downloads');
+    try {
+      const { exec } = require('child_process');
+      exec(`explorer.exe "${downloadsDir}"`);
+      return sendJson(res, 200, { success: true, folder: downloadsDir });
+    } catch (e) {
+      return sendJson(res, 500, { success: false, error: e.message });
+    }
+  }
+
   // Static File Serving (from ./ui, ./, or ./assets)
   let filePath = '';
   if (pathname === '/' || pathname === '/index.html' || pathname === '/dashboard.html') {
