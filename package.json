@@ -21,5 +21,8 @@
     "tokens"
   ],
   "author": "Antigravity Engineering",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "html2canvas": "^1.4.1"
+  }
 }

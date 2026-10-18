@@ -11,7 +11,7 @@
 
   const PLUGIN_BASE_URL = 'http://127.0.0.1:49221';
   let activeBackdrop = null;
-  let currentTheme = localStorage.getItem('aga-theme') || 'light';
+  let currentTheme = localStorage.getItem('aga-theme') || 'dark';
 
   function logTrace(msg) {
     console.log(`[GravityLog] ${msg}`);
@@ -205,7 +205,13 @@
               <button class="aga-btn-icon" id="aga-btn-refresh-m" title="Refresh Telemetry">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
               </button>
-              <button class="aga-close-btn" id="aga-btn-close-m" title="Close (Esc)">✕</button>
+              <!-- Screenshot Export Button -->
+              <button class="aga-btn-icon" id="aga-btn-screenshot-m" title="Export Screenshot (Share Image)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -360,7 +366,67 @@
       });
     });
 
-    activeBackdrop.querySelector('#aga-btn-close-m')?.addEventListener('click', closeModal);
+    const refreshBtnM = activeBackdrop.querySelector('#aga-btn-refresh-m');
+    if (refreshBtnM) {
+      refreshBtnM.addEventListener('click', () => {
+        refreshBtnM.disabled = true;
+        refreshBtnM.classList.add('aga-spinning');
+        setTimeout(() => {
+          const currentTimeframe = data.timeframe || 'all';
+          closeModal();
+          openModal(getLocalTelemetry(currentTimeframe));
+        }, 400);
+      });
+    }
+
+    const screenshotBtnM = activeBackdrop.querySelector('#aga-btn-screenshot-m');
+    if (screenshotBtnM) {
+      screenshotBtnM.addEventListener('click', async () => {
+        const card = activeBackdrop.querySelector('#aga-injected-card');
+        if (!card) return;
+        screenshotBtnM.disabled = true;
+        screenshotBtnM.classList.add('aga-spinning');
+        try {
+          if (typeof window.html2canvas === 'undefined') {
+            try {
+              const script = document.createElement('script');
+              script.src = 'http://127.0.0.1:49221/html2canvas.min.js';
+              document.head.appendChild(script);
+              await new Promise((resolve) => {
+                script.onload = resolve;
+                script.onerror = resolve;
+                setTimeout(resolve, 1000);
+              });
+            } catch (e) {}
+          }
+
+          if (typeof window.html2canvas === 'function') {
+            const canvas = await window.html2canvas(card, {
+              scale: 2,
+              useCORS: true,
+              allowTaint: true,
+              backgroundColor: currentTheme === 'light' ? '#f8fafd' : '#131314',
+              logging: false
+            });
+            const dateStr = new Date().toISOString().slice(0, 10);
+            const link = document.createElement('a');
+            link.download = `gravitylog-usage-${dateStr}.png`;
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            window.open('http://127.0.0.1:49221/dashboard.html', '_blank');
+          }
+        } catch (err) {
+          console.error('[GravityLog] Screenshot error:', err);
+        } finally {
+          screenshotBtnM.disabled = false;
+          screenshotBtnM.classList.remove('aga-spinning');
+        }
+      });
+    }
+
     activeBackdrop.querySelector('#aga-btn-done')?.addEventListener('click', closeModal);
     activeBackdrop.querySelector('#aga-btn-view-sidecar')?.addEventListener('click', () => {
       window.location.href = 'sidecar://antigravity-analytics/usage-analytics/';

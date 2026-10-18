@@ -27,9 +27,9 @@
       this.root = rootElement || document.body;
       this.apiBase = options.apiBase || window.location.origin || 'http://127.0.0.1:49221';
       this.timeframe = 'all';
-      this.preview = false;
-      this.theme = localStorage.getItem('aga-theme') || 'light';
+      this.theme = localStorage.getItem('aga-theme') || 'dark';
       this.data = null;
+      this.autoRefreshTimer = null;
       this.onClose = options.onClose || null;
 
       this.init();
@@ -40,6 +40,7 @@
       this.renderSkeleton();
       this.bindEvents();
       await this.fetchMetrics();
+      this.startAutoRefresh();
     }
 
     applyDocumentTheme() {
@@ -84,8 +85,13 @@
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
                 </button>
 
-                <!-- Close Button -->
-                <button class="aga-close-btn" id="aga-btn-close" title="Close (Esc)">✕</button>
+                <!-- Screenshot Export Button -->
+                <button class="aga-btn-icon" id="aga-btn-screenshot" title="Export Screenshot (Share Image)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -202,11 +208,9 @@
 
           <!-- Footer Controls -->
           <footer class="aga-footer">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <label style="font-size: 12.5px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                <input type="checkbox" id="aga-preview-toggle" style="cursor: pointer;">
-                <span>Preview Sample Data</span>
-              </label>
+            <div class="aga-live-indicator">
+              <span class="aga-live-dot"></span>
+              <span class="aga-live-text">Live Telemetry &middot; Auto-refreshes every 30s</span>
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -218,6 +222,54 @@
 
         <div class="aga-floating-tooltip" id="aga-tooltip"></div>
       `;
+    }
+
+    startAutoRefresh() {
+      if (this.autoRefreshTimer) clearInterval(this.autoRefreshTimer);
+      this.autoRefreshTimer = setInterval(() => {
+        this.fetchMetrics();
+      }, 30000);
+    }
+
+    async downloadScreenshot() {
+      const card = this.root.querySelector('#aga-modal-card');
+      if (!card) return;
+      const btn = this.root.querySelector('#aga-btn-screenshot');
+      if (btn) {
+        btn.disabled = true;
+        btn.classList.add('aga-spinning');
+      }
+
+      try {
+        if (typeof window.html2canvas === 'undefined') {
+          alert('Screenshot module is loading, please try again.');
+          return;
+        }
+
+        const canvas = await window.html2canvas(card, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: this.theme === 'light' ? '#f8fafd' : '#131314',
+          logging: false
+        });
+
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const link = document.createElement('a');
+        link.download = `gravitylog-usage-${dateStr}.png`;
+        link.href = canvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error('[GravityLog] Screenshot export error:', err);
+        alert('Failed to generate screenshot: ' + (err.message || err));
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.classList.remove('aga-spinning');
+        }
+      }
     }
 
     bindEvents() {
@@ -248,33 +300,36 @@
         });
       }
 
-      // Refresh
+      // Refresh with interactive feedback
       const refreshBtn = this.root.querySelector('#aga-btn-refresh');
       if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => this.fetchMetrics());
+        refreshBtn.addEventListener('click', async () => {
+          refreshBtn.disabled = true;
+          refreshBtn.classList.add('aga-spinning');
+          try {
+            await this.fetchMetrics(true);
+          } finally {
+            setTimeout(() => {
+              refreshBtn.classList.remove('aga-spinning');
+              refreshBtn.disabled = false;
+            }, 500);
+          }
+        });
       }
 
-      // Preview toggle
-      const previewToggle = this.root.querySelector('#aga-preview-toggle');
-      if (previewToggle) {
-        previewToggle.addEventListener('change', (e) => {
-          this.preview = e.target.checked;
-          this.fetchMetrics();
-        });
+      // Screenshot export
+      const screenshotBtn = this.root.querySelector('#aga-btn-screenshot');
+      if (screenshotBtn) {
+        screenshotBtn.addEventListener('click', () => this.downloadScreenshot());
       }
 
       // Export buttons
       this.root.querySelector('#aga-btn-export-json')?.addEventListener('click', () => {
-        window.open(`${this.apiBase}/api/export?format=json&preview=${this.preview}`, '_blank');
+        window.open(`${this.apiBase}/api/export?format=json`, '_blank');
       });
 
       this.root.querySelector('#aga-btn-export-csv')?.addEventListener('click', () => {
-        window.open(`${this.apiBase}/api/export?format=csv&preview=${this.preview}`, '_blank');
-      });
-
-      // Close button
-      this.root.querySelector('#aga-btn-close')?.addEventListener('click', () => {
-        if (this.onClose) this.onClose();
+        window.open(`${this.apiBase}/api/export?format=csv`, '_blank');
       });
 
       // Floating tooltip tracking
@@ -295,9 +350,14 @@
       });
     }
 
-    async fetchMetrics() {
+    async fetchMetrics(force = false) {
       try {
-        const res = await fetch(`${this.apiBase}/api/metrics?timeframe=${this.timeframe}&preview=${this.preview}`);
+        const queryParams = new URLSearchParams({
+          timeframe: this.timeframe,
+          refresh: force ? 'true' : 'false',
+          _t: Date.now()
+        });
+        const res = await fetch(`${this.apiBase}/api/metrics?${queryParams.toString()}`);
         if (res.ok) {
           this.data = await res.json();
           this.renderData(this.data);

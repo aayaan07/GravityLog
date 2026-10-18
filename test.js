@@ -73,6 +73,7 @@ async function runTests() {
     path.join('ui', 'dashboard.html'),
     path.join('ui', 'dashboard.css'),
     path.join('ui', 'dashboard.js'),
+    path.join('ui', 'html2canvas.min.js'),
     path.join('ui', 'injector.js'),
     path.join('sidecars', 'usage-analytics', 'sidecar.json'),
     path.join('skills', 'usage-analytics', 'SKILL.md')

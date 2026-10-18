@@ -28,10 +28,10 @@ It delivers real-time visibility into your AI coding workflows by aggregating lo
 
 ## ✨ Features
 
-### 🌓 Dual-Theme System (Light & Dark)
+### 🌓 Dual-Theme System (Dark Default & Light)
 - **100% Native Styling**: Automatically matches Antigravity's sleek aesthetic.
+- **Dark Mode by Default**: Elevated zinc surfaces (`#1e1f20`), subtle dark borders, and cyan/purple accents.
 - **Reference Light Mode**: Crisp white surfaces (`#ffffff`), subtle borders (`#e2e8f0`), soft blue/emerald/amber icon badges, and high-contrast typography.
-- **Dark Mode**: Elevated zinc surfaces (`#18181b`), subtle dark borders, and cyan/purple accents.
 - **Persistent Toggle**: Switch themes instantly via the header toggle button; preference persists in `localStorage`.
 
 ### 📊 Bento KPI Summary Row
@@ -57,10 +57,14 @@ It delivers real-time visibility into your AI coding workflows by aggregating lo
 - Cached via mtime/size checks in `telemetry_cache.json` for zero-lag performance.
 - Works offline and requires zero external cloud dependencies.
 
-### 🧪 Sample Data Preview Switch
-- Toggle "Preview Sample Data" at any time from the dashboard footer to instantly preview the complete dashboard with realistic sample data even on fresh Antigravity installations.
+### 🔄 30s Auto-Refresh & Interactive Reload
+- Live telemetry polling updates automatically every 30 seconds.
+- Interactive refresh button provides smooth visual spin feedback while instantly re-indexing new conversations.
 
-### 📥 One-Click Telemetry Export
+### 📸 One-Click Screenshot Export
+- Export crisp, 2x retina PNG snapshots (`gravitylog-usage-YYYY-MM-DD.png`) with one click directly from the header camera icon to share on Twitter/X, GitHub, or Discord.
+
+### 📥 Structured Telemetry Export
 - Export your full activity dataset instantly as structured **JSON** or spreadsheet-ready **CSV**.
 
 ---
@@ -124,6 +128,7 @@ D:\Project\GitGravity\
     ├── dashboard.html             # Standalone dashboard HTML template
     ├── dashboard.css              # Dual-theme (Light/Dark) stylesheet
     ├── dashboard.js               # Interactive UI controller & chart renderer
+    ├── html2canvas.min.js         # Offline client-side PNG screenshot engine
     └── injector.js                # Electron native modal injector
 ```
 

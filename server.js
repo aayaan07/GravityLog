@@ -91,16 +91,10 @@ const server = http.createServer((req, res) => {
 
   if (pathname === '/api/metrics') {
     const timeframe = query.timeframe || 'all';
-    const isPreview = query.preview === 'true';
-    if (isPreview) {
-      return sendJson(res, 200, indexer.getPreviewData());
-    }
-    if (query.refresh === 'true') {
-      try {
-        indexer.scanIncrementally();
-      } catch (e) {
-        console.warn('[Server] Incremental scan error on refresh:', e.message);
-      }
+    try {
+      indexer.scanIncrementally();
+    } catch (e) {
+      console.warn('[Server] Incremental scan error:', e.message);
     }
     const metrics = indexer.aggregate(timeframe);
     return sendJson(res, 200, metrics);
@@ -117,8 +111,7 @@ const server = http.createServer((req, res) => {
 
   if (pathname === '/api/export') {
     const format = (query.format || 'json').toLowerCase();
-    const isPreview = query.preview === 'true';
-    return handleExport(res, format, isPreview);
+    return handleExport(res, format, false);
   }
 
   // Static File Serving (from ./ui, ./, or ./assets)
