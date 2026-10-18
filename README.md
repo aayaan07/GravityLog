@@ -93,10 +93,7 @@ flowchart TD
 
 ### 2. How to Open the Dashboard
 
-- **Right Sidebar Pane:** Click the **menu / 3 dots (`...`)** in the top right of the Antigravity window &rarr; select **Extensions** &rarr; click **GravityLog** to open the sidebar.
-- **Direct Sidecar URL:** You can also open the sidecar pane directly via `sidecar://antigravity-analytics/usage-analytics/` or `sidecar://usage-analytics/`.
-- **Standalone Web URL:** Access the dashboard in any browser at `http://localhost:49221` while Antigravity is running.
-- **Keyboard Shortcut:** Press `Ctrl + Shift + U` to toggle the native modal overlay from anywhere inside the app.
+Click the **menu / 3 dots (`...`)** in the top right of the Antigravity window &rarr; select **Extensions** &rarr; click **GravityLog** to open the sidebar.
 
 ---
 
@@ -112,11 +109,6 @@ GravityLog registers a local MCP server that allows Antigravity AI agents to und
 | `get_activity_heatmap` | `preview` (`boolean`) | Returns the 365-day contribution matrix mapping daily buckets to levels 0-4. |
 | `get_model_breakdown` | `preview` (`boolean`) | Returns ranked AI models with token and request share percentages. |
 | `export_telemetry` | `format` (`json` or `csv`), `preview` (`boolean`) | Returns telemetry data formatted as JSON or CSV text. |
-
-### Sample Prompts for Antigravity:
-- *"Show my GravityLog usage analytics and token metrics"*
-- *"How many prompt tokens did I consume this week?"*
-- *"Export my monthly AI usage to CSV"*
 
 ---
 
