@@ -222,19 +222,6 @@
               <div class="aga-model-list" id="aga-model-list"></div>
             </div>
           </div>
-
-          <!-- Footer Controls -->
-          <footer class="aga-footer">
-            <div class="aga-live-indicator">
-              <span class="aga-live-dot"></span>
-              <span class="aga-live-text">Live Telemetry &middot; Auto-refreshes every 30s</span>
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <button class="aga-btn-secondary" id="aga-btn-export-json">Export JSON</button>
-              <button class="aga-btn-secondary" id="aga-btn-export-csv">Export CSV</button>
-            </div>
-          </footer>
         </div>
 
         <div class="aga-floating-tooltip" id="aga-tooltip"></div>
@@ -433,15 +420,6 @@
 
       this.root.querySelector('#aga-toast-close')?.addEventListener('click', () => {
         this.root.querySelector('#aga-toast')?.classList.remove('show');
-      });
-
-      // Export buttons
-      this.root.querySelector('#aga-btn-export-json')?.addEventListener('click', () => {
-        window.open(`${this.apiBase}/api/export?format=json`, '_blank');
-      });
-
-      this.root.querySelector('#aga-btn-export-csv')?.addEventListener('click', () => {
-        window.open(`${this.apiBase}/api/export?format=csv`, '_blank');
       });
 
       // Floating tooltip tracking

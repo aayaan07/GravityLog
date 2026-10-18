@@ -64,8 +64,8 @@ It delivers real-time visibility into your AI coding workflows by aggregating lo
 ### 📸 One-Click Screenshot Export
 - Export crisp, 2x retina PNG snapshots (`gravitylog-usage-YYYY-MM-DD.png`) with one click directly from the header camera icon to share on Twitter/X, GitHub, or Discord.
 
-### 📥 Structured Telemetry Export
-- Export your full activity dataset instantly as structured **JSON** or spreadsheet-ready **CSV**.
+### 📥 Structured Telemetry API
+- Query or export your full activity dataset at any time via `/api/export?format=json` or `/api/export?format=csv`.
 
 ---
 
