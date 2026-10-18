@@ -28,44 +28,14 @@ It delivers real-time visibility into your AI coding workflows by aggregating lo
 
 ## ✨ Features
 
-### 🌓 Dual-Theme System (Dark Default & Light)
-- **100% Native Styling**: Automatically matches Antigravity's sleek aesthetic.
-- **Dark Mode by Default**: Elevated zinc surfaces (`#1e1f20`), subtle dark borders, and cyan/purple accents.
-- **Reference Light Mode**: Crisp white surfaces (`#ffffff`), subtle borders (`#e2e8f0`), soft blue/emerald/amber icon badges, and high-contrast typography.
-- **Persistent Toggle**: Switch themes instantly via the header toggle button; preference persists in `localStorage`.
-
-### 📊 Bento KPI Summary Row
-1. **Total Requests**: Lifetime completion requests count, today's delta badge (`+X today`), and total user messages/prompts sent.
-2. **Total Tokens & Explicit Breakdown**:
-   - Total volume formatted adaptively (e.g., `115.1M` or `840K`).
-   - **Explicit Input/Output Rows**: Dedicated, clearly visible input and output token counts directly inside the card—no hidden hover tooltips required.
-3. **Most Used Model**: Top AI model by token consumption with percentage share badge.
-4. **Active Streak**: Consecutive days of coding activity alongside your all-time longest streak.
-
-### 📅 365-Day GitHub-Style Activity Heatmap
-- Full 52/53-week × 7-day contribution grid displaying month labels (`Jan`–`Dec`) and day labels (`Mon`, `Wed`, `Fri`).
-- 5 distinct activity intensity levels (0 to 4) themed with Google Material 3 accents.
-- **Interactive Tooltip**: Hover over any calendar square for exact statistics (`"48 requests • 142,300 tokens on Oct 16, 2026"`).
-- **Timeframe Filtering**: Toggle instantly between `Today`, `1 Week` (`1w`), `30 Days` (`30d`), `90 Days` (`90d`), and `All Time` (`all`).
-
-### 🥧 Multi-Model Distribution
-- Segmented, rounded progress bar showing proportional usage across all AI models (Gemini 3.8 Flash, Gemini 3.8 Pro, Claude 3.5 Sonnet, Claude 3.7 Sonnet, GPT-4o, and local models).
-- Itemized breakdown showing per-model request counts, token volumes, and market share percentages.
-
-### ⚡ Incremental Telemetry & Background Indexer
-- Scans conversation transcripts in `%USERPROFILE%\.gemini\antigravity\brain\` incrementally.
-- Cached via mtime/size checks in `telemetry_cache.json` for zero-lag performance.
-- Works offline and requires zero external cloud dependencies.
-
-### 🔄 30s Auto-Refresh & Interactive Reload
-- Live telemetry polling updates automatically every 30 seconds.
-- Interactive refresh button provides smooth visual spin feedback while instantly re-indexing new conversations.
-
-### 📸 One-Click Screenshot Export
-- Export crisp, 2x retina PNG snapshots (`gravitylog-usage-YYYY-MM-DD.png`) with one click directly from the header camera icon to share on Twitter/X, GitHub, or Discord.
-
-### 📥 Structured Telemetry API
-- Query or export your full activity dataset at any time via `/api/export?format=json` or `/api/export?format=csv`.
+- **🌓 Dual-Theme System**: Sleek Google Material 3 dark mode by default with instant light mode toggle.
+- **📊 Bento KPI Summary**: Real-time totals for requests, user messages sent, explicit token input/output breakdown, top model, and active streaks.
+- **📅 365-Day Activity Heatmap**: GitHub-style 52-week calendar with 5 intensity levels, interactive hover tooltips, and timeframe filters (`today`, `1w`, `30d`, `90d`, `all`).
+- **🥧 Model Distribution**: Segmented visual progress bar and ranked breakdown of per-model request counts, token volumes, and share percentages.
+- **⚡ Fast Incremental Telemetry**: Offline background indexer caching conversation transcripts with zero performance impact.
+- **🔄 30s Auto-Refresh**: Live automatic polling every 30 seconds with interactive reload animation feedback.
+- **📸 One-Click Screenshot Export**: Instant 2x retina PNG capture auto-saved directly to your Windows Downloads folder and clipboard.
+- **🤖 Native MCP Server**: Built-in Model Context Protocol tools for AI agents to inspect your usage statistics through natural chat.
 
 ---
 
@@ -97,51 +67,14 @@ flowchart TD
 
 ---
 
-## 📦 Project Structure
+## 📥 Installation & Usage
 
-```text
-D:\Project\GitGravity\
-├── GravityLog-logo.png            # Official GravityLog mascot logo
-├── plugin.json                    # Antigravity 2.0 plugin manifest
-├── package.json                   # NPM configuration, dependencies & scripts
-├── mcp_config.json                # Model Context Protocol registration
-├── server.js                      # Local HTTP API & static asset server
-├── install.ps1                    # Automated Windows PowerShell installer
-├── uninstall.ps1                  # Clean removal & restoration script
-├── test.js                        # Automated test suite (33 assertions)
-├── asar_patcher.py                # Optional Electron preload patch utility
-├── LICENSE                        # MIT License
-├── README.md                      # Documentation
-├── engine/
-│   ├── indexer.js                 # Transcript parser, token aggregator & streaks
-│   └── telemetry_cache.json       # Incremental cache file
-├── mcp/
-│   └── mcp_server.js              # JSON-RPC 2.0 MCP server for Antigravity AI
-├── sidecars/
-│   └── usage-analytics/
-│       ├── sidecar.json           # Antigravity UI sidecar manifest
-│       └── index.js               # Sidecar process loader
-├── skills/
-│   └── usage-analytics/
-│       └── SKILL.md               # AI agent prompt integration & documentation
-└── ui/
-    ├── dashboard.html             # Standalone dashboard HTML template
-    ├── dashboard.css              # Dual-theme (Light/Dark) stylesheet
-    ├── dashboard.js               # Interactive UI controller & chart renderer
-    ├── html2canvas.min.js         # Offline client-side PNG screenshot engine
-    └── injector.js                # Electron native modal injector
-```
-
----
-
-## 📥 Installation
-
-### Method 1: Automated 1-Click Installer (Recommended)
+### 1. Install GravityLog
 
 1. Clone or download this repository:
    ```bash
-   git clone https://github.com/your-username/GitGravity.git
-   cd GitGravity
+   git clone https://github.com/your-username/GravityLog.git
+   cd GravityLog
    ```
 
 2. Run the automated PowerShell installer:
@@ -153,64 +86,17 @@ D:\Project\GitGravity\
    npm run install-plugin
    ```
 
-The installer automatically:
-- Deploys the plugin to `%USERPROFILE%\.gemini\config\plugins\antigravity-analytics\`
-- Registers the sidecar auxiliary pane in `%USERPROFILE%\.gemini\config\sidecars\usage-analytics\`
-- Enables the plugin in Antigravity's `config.json`
-- Verifies the local telemetry engine with the test suite
-- Launches the local background service on port `49221` (or dynamic sidecar port)
+3. **Enable the Extension in Antigravity:**
+   > **Important:** Open Antigravity, go to the **Customizations** tab &rarr; **Installed Plugins** &rarr; find **GravityLog** and ensure the UI extension toggle is **Enabled**. You must enable it here, otherwise it will not show in the right sidebar pane.
 
 ---
 
-### Method 2: Manual Installation
+### 2. How to Open the Dashboard
 
-1. Copy the repository contents into:
-   ```text
-   C:\Users\<YourUsername>\.gemini\config\plugins\antigravity-analytics\
-   ```
-
-2. Enable the plugin in your `C:\Users\<YourUsername>\.gemini\config\config.json`:
-   ```json
-   {
-     "plugins": {
-       "antigravity-analytics": {
-         "enabled": true
-       }
-     }
-   }
-   ```
-
-3. Start the background service:
-   ```bash
-   node server.js
-   ```
-
----
-
-## 🖥️ How to Use
-
-### 1. Native Right Sidebar Auxiliary Pane
-In Antigravity 2.0, open the extensions or sidecar pane on the right sidebar and select **GravityLog**, or navigate to:
-```text
-sidecar://antigravity-analytics/usage-analytics/
-```
-or global link:
-```text
-sidecar://usage-analytics/
-```
-
-### 2. Standalone Browser Dashboard
-Access the dashboard from any browser while Antigravity is running:
-```text
-http://localhost:49221
-```
-
-### 3. Keyboard Shortcut (Modal Overlay)
-When Electron injection is enabled, press:
-```text
-Ctrl + Shift + U
-```
-to toggle the native modal overlay from anywhere inside the app. Press `Esc` or click the backdrop to dismiss.
+- **Right Sidebar Pane:** Click the **menu / 3 dots (`...`)** in the top right of the Antigravity window &rarr; select **Extensions** &rarr; click **GravityLog** to open the sidebar.
+- **Direct Sidecar URL:** You can also open the sidecar pane directly via `sidecar://antigravity-analytics/usage-analytics/` or `sidecar://usage-analytics/`.
+- **Standalone Web URL:** Access the dashboard in any browser at `http://localhost:49221` while Antigravity is running.
+- **Keyboard Shortcut:** Press `Ctrl + Shift + U` to toggle the native modal overlay from anywhere inside the app.
 
 ---
 
@@ -231,27 +117,6 @@ GravityLog registers a local MCP server that allows Antigravity AI agents to und
 - *"Show my GravityLog usage analytics and token metrics"*
 - *"How many prompt tokens did I consume this week?"*
 - *"Export my monthly AI usage to CSV"*
-
----
-
-## 🧪 Testing & Verification
-
-Run the built-in automated test suite:
-```bash
-npm test
-```
-or:
-```powershell
-node test.js
-```
-
-The test runner validates:
-- Incremental transcript scanning and live metrics calculation
-- 365+ day calendar generation and intensity quantile binning
-- Active streak and longest streak computation
-- Timeframe window filtering (`30d`, `90d`, `1y`, `all`)
-- Sample preview data integrity matching the reference design (3,614 requests, 115.1M tokens)
-- File structure and manifest integrity
 
 ---
 
