@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "lastScan": 1792247592947,
+  "lastScan": 1792303547472,
   "conversations": {
     "5a689570-481f-454d-93ec-73995eaa6abe": {
-      "mtime": 1792247590155.2036,
-      "size": 1704115,
-      "requests": 578,
-      "userPrompts": 7,
-      "inputTokens": 3686167,
-      "outputTokens": 439886,
-      "cacheTokens": 68025410,
-      "thinkingTokens": 36702,
+      "mtime": 1792303543942.4263,
+      "size": 1902238,
+      "requests": 653,
+      "userPrompts": 9,
+      "inputTokens": 4269707,
+      "outputTokens": 469837,
+      "cacheTokens": 81908414,
+      "thinkingTokens": 39049,
       "model": "Gemini 3.8 Flash",
       "daily": {
         "2026-10-16": {
@@ -23,13 +23,22 @@
           "tokens": 2013527
         },
         "2026-10-17": {
-          "requests": 303,
+          "requests": 340,
           "userPrompts": 5,
-          "inputTokens": 1869792,
-          "outputTokens": 242734,
-          "cacheTokens": 38090278,
-          "thinkingTokens": 19004,
-          "tokens": 2112526
+          "inputTokens": 2155739,
+          "outputTokens": 255701,
+          "cacheTokens": 44483801,
+          "thinkingTokens": 20123,
+          "tokens": 2411440
+        },
+        "2026-10-18": {
+          "requests": 38,
+          "userPrompts": 2,
+          "inputTokens": 297593,
+          "outputTokens": 16984,
+          "cacheTokens": 7489481,
+          "thinkingTokens": 1228,
+          "tokens": 314577
         }
       }
     }

@@ -102,7 +102,7 @@
                 </div>
                 <div class="aga-kpi-value" id="kpi-val-requests">...</div>
                 <div class="aga-kpi-footer">
-                  <span class="aga-kpi-subtext" id="kpi-sub-requests">... in last 30 days</span>
+                  <span class="aga-kpi-subtext" id="kpi-sub-requests">... user messages sent</span>
                 </div>
               </div>
 
@@ -313,6 +313,7 @@
           synced: true,
           totals: {
             requests: 121,
+            userPrompts: 14,
             requestsToday: 2,
             requests30d: 109,
             tokens: 16200000,
@@ -345,7 +346,10 @@
       if (todayBadge) todayBadge.textContent = `+${data.totals.requestsToday} today`;
 
       const subReq = this.root.querySelector('#kpi-sub-requests');
-      if (subReq) subReq.textContent = `${data.totals.requests30d.toLocaleString()} in last 30 days`;
+      if (subReq) {
+        const count = data.totals.userPrompts || 0;
+        subReq.textContent = `${count.toLocaleString()} user message${count === 1 ? '' : 's'} sent`;
+      }
 
       // KPI 2: Tokens
       const tokEl = this.root.querySelector('#kpi-val-tokens');

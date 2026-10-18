@@ -42,7 +42,7 @@
       for (const cachePath of candidatePaths) {
         if (fs.existsSync(cachePath)) {
           const cache = JSON.parse(fs.readFileSync(cachePath, 'utf8'));
-          let totalReqs = 0, reqsToday = 0, reqs30d = 0;
+          let totalReqs = 0, reqsToday = 0, reqs30d = 0, totalPrompts = 0;
           let totalInp = 0, totalOut = 0, totalCache = 0, totalThink = 0;
           const dailyBuckets = {};
           const modelStats = {};
@@ -76,6 +76,7 @@
 
               if (isInc(dMs)) {
                 totalReqs += (dData.requests || 0);
+                totalPrompts += (dData.userPrompts || 0);
                 totalInp += (dData.inputTokens || 0);
                 totalOut += (dData.outputTokens || 0);
                 totalCache += (dData.cacheTokens || 0);
@@ -124,6 +125,7 @@
             timeframe,
             totals: {
               requests: totalReqs,
+              userPrompts: totalPrompts,
               requestsToday: reqsToday,
               requests30d: reqs30d,
               tokens: totalTokens,
@@ -149,6 +151,7 @@
       timeframe,
       totals: {
         requests: 121,
+        userPrompts: 14,
         requestsToday: 2,
         requests30d: 109,
         tokens: 16200000,
@@ -217,7 +220,7 @@
               </div>
               <div class="aga-kpi-value">${data.totals.requests.toLocaleString()}</div>
               <div class="aga-kpi-footer">
-                <span class="aga-kpi-subtext">${data.totals.requests30d.toLocaleString()} in last 30 days</span>
+                <span class="aga-kpi-subtext">${(data.totals.userPrompts || 0).toLocaleString()} user message${data.totals.userPrompts === 1 ? '' : 's'} sent</span>
               </div>
             </div>
 

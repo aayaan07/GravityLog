@@ -35,7 +35,7 @@ It delivers real-time visibility into your AI coding workflows by aggregating lo
 - **Persistent Toggle**: Switch themes instantly via the header toggle button; preference persists in `localStorage`.
 
 ### 📊 Bento KPI Summary Row
-1. **Total Requests**: Lifetime prompt count, today's delta badge (`+X today`), and 30-day volume.
+1. **Total Requests**: Lifetime completion requests count, today's delta badge (`+X today`), and total user messages/prompts sent.
 2. **Total Tokens & Explicit Breakdown**:
    - Total volume formatted adaptively (e.g., `115.1M` or `840K`).
    - **Explicit Input/Output Rows**: Dedicated, clearly visible input and output token counts directly inside the card—no hidden hover tooltips required.
